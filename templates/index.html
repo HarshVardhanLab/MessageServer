@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - View Messages</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    #messages {
+      margin-top: 20px;
+    }
+    .message-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .message-card h3 {
+      margin: 0 0 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📩 Received Messages</h1>
+
+  <input type="password" id="adminPassword" placeholder="Enter Admin Password" />
+  <button onclick="fetchMessages()">Load Messages</button>
+
+  <div id="messages"></div>
+
+  <script>
+    async function fetchMessages() {
+      const password = document.getElementById("adminPassword").value;
+      const response = await fetch("http://localhost:5000/messages?password=" + password);
+
+      const container = document.getElementById("messages");
+      container.innerHTML = "";
+
+      if (!response.ok) {
+        container.innerHTML = "<p style='color:red;'>❌ Unauthorized or error fetching messages.</p>";
+        return;
+      }
+
+      const messages = await response.json();
+      if (messages.length === 0) {
+        container.innerHTML = "<p>No messages found.</p>";
+        return;
+      }
+
+      messages.forEach(msg => {
+        const div = document.createElement("div");
+        div.className = "message-card";
+        div.innerHTML = `
+          <h3>${msg.name} <small>(${msg.email})</small></h3>
+          <p>${msg.message}</p>
+        `;
+        container.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>
